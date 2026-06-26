@@ -6,7 +6,7 @@ const {
   getWishlist,
   checkWishlist,
   removeFromWishlist,
-} = require('../controllers/wishlist.controller');
+} = require('../controllers/Wishlist.controller');
 
 // NOTE: /check/:itemId must come BEFORE /:itemId to avoid route conflict
 router.get   ('/check/:itemId', protect, checkWishlist);
