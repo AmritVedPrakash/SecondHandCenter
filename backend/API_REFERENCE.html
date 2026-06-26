@@ -1,0 +1,1180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>BazaarBuddy — API Reference</title>
+<style>
+@import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@300;400;500;600;700&family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap');
+
+:root {
+  --bg:       #0d0d11;
+  --surface:  #13131a;
+  --card:     #1a1a24;
+  --border:   #252535;
+  --border2:  #2e2e42;
+  --accent:   #ff6b35;
+  --purple:   #8b5cf6;
+  --text:     #e2e2ee;
+  --muted:    #5a5a78;
+  --muted2:   #3a3a52;
+  --GET:      #22c55e;
+  --POST:     #3b82f6;
+  --PUT:      #f59e0b;
+  --PATCH:    #a78bfa;
+  --DELETE:   #ef4444;
+  --mono:     'JetBrains Mono', monospace;
+  --sans:     'Plus Jakarta Sans', sans-serif;
+}
+
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { scroll-behavior: smooth; }
+
+body {
+  background: var(--bg);
+  color: var(--text);
+  font-family: var(--sans);
+  min-height: 100vh;
+  display: flex;
+}
+
+/* ─── SIDEBAR ─── */
+.sidebar {
+  width: 260px;
+  min-height: 100vh;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  position: sticky;
+  top: 0;
+  height: 100vh;
+  overflow-y: auto;
+  flex-shrink: 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.sidebar-logo {
+  padding: 24px 20px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.sidebar-logo .brand {
+  font-size: 1.2rem;
+  font-weight: 800;
+  background: linear-gradient(135deg, var(--accent), var(--purple));
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  letter-spacing: -0.5px;
+}
+
+.sidebar-logo .version {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--muted);
+  margin-top: 4px;
+}
+
+.sidebar-logo .base-url {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  color: var(--accent);
+  margin-top: 6px;
+  background: rgba(255,107,53,0.1);
+  padding: 3px 8px;
+  border-radius: 4px;
+  display: inline-block;
+}
+
+.sidebar-nav {
+  padding: 16px 0;
+  flex: 1;
+}
+
+.nav-section { margin-bottom: 4px; }
+
+.nav-section-title {
+  font-size: 0.65rem;
+  font-weight: 700;
+  letter-spacing: 1.5px;
+  text-transform: uppercase;
+  color: var(--muted);
+  padding: 8px 20px 4px;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 8px 20px;
+  cursor: pointer;
+  transition: background 0.15s;
+  text-decoration: none;
+  color: var(--text);
+  font-size: 0.82rem;
+  font-weight: 500;
+}
+
+.nav-item:hover, .nav-item.active {
+  background: rgba(255,107,53,0.08);
+  color: var(--accent);
+}
+
+.nav-item .icon { font-size: 0.9rem; width: 18px; text-align: center; }
+
+.nav-count {
+  margin-left: auto;
+  font-family: var(--mono);
+  font-size: 0.62rem;
+  background: var(--border2);
+  color: var(--muted);
+  padding: 1px 6px;
+  border-radius: 10px;
+}
+
+/* ─── MAIN CONTENT ─── */
+.main {
+  flex: 1;
+  overflow-y: auto;
+  padding: 0 0 80px;
+}
+
+.top-bar {
+  background: var(--surface);
+  border-bottom: 1px solid var(--border);
+  padding: 16px 40px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 10;
+}
+
+.top-bar h1 {
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--text);
+}
+
+.top-bar .stats {
+  display: flex;
+  gap: 20px;
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  color: var(--muted);
+}
+
+.top-bar .stats span { color: var(--text); font-weight: 600; }
+
+.section {
+  padding: 0 40px;
+  margin-top: 40px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 16px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid var(--border);
+}
+
+.section-header .emoji { font-size: 1.2rem; }
+
+.section-header h2 {
+  font-size: 1.05rem;
+  font-weight: 700;
+}
+
+.section-header .prefix {
+  font-family: var(--mono);
+  font-size: 0.75rem;
+  color: var(--accent);
+  background: rgba(255,107,53,0.1);
+  padding: 3px 10px;
+  border-radius: 6px;
+  border: 1px solid rgba(255,107,53,0.2);
+  margin-left: auto;
+}
+
+.routes-list { display: flex; flex-direction: column; gap: 8px; }
+
+.route-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  overflow: hidden;
+  transition: border-color 0.2s;
+}
+
+.route-card:hover { border-color: var(--border2); }
+
+.route-header {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 16px;
+  cursor: pointer;
+}
+
+.route-header:hover .expand-icon { color: var(--text); }
+
+.method-badge {
+  font-family: var(--mono);
+  font-size: 0.68rem;
+  font-weight: 700;
+  padding: 4px 10px;
+  border-radius: 5px;
+  min-width: 64px;
+  text-align: center;
+  flex-shrink: 0;
+}
+.GET    { background: rgba(34,197,94,0.15);  color: var(--GET);    border: 1px solid rgba(34,197,94,0.25); }
+.POST   { background: rgba(59,130,246,0.15); color: var(--POST);   border: 1px solid rgba(59,130,246,0.25); }
+.PUT    { background: rgba(245,158,11,0.15); color: var(--PUT);    border: 1px solid rgba(245,158,11,0.25); }
+.PATCH  { background: rgba(167,139,250,0.15);color: var(--PATCH);  border: 1px solid rgba(167,139,250,0.25); }
+.DELETE { background: rgba(239,68,68,0.15);  color: var(--DELETE); border: 1px solid rgba(239,68,68,0.25); }
+
+.route-path {
+  font-family: var(--mono);
+  font-size: 0.82rem;
+  color: var(--text);
+  flex: 1;
+}
+
+.route-desc {
+  font-size: 0.78rem;
+  color: var(--muted);
+  margin-left: auto;
+  max-width: 280px;
+  text-align: right;
+}
+
+.badge {
+  font-family: var(--mono);
+  font-size: 0.6rem;
+  padding: 2px 7px;
+  border-radius: 4px;
+  flex-shrink: 0;
+}
+.badge-auth  { background: rgba(255,107,53,0.15); color: var(--accent); border: 1px solid rgba(255,107,53,0.3); }
+.badge-admin { background: rgba(239,68,68,0.15);  color: var(--DELETE); border: 1px solid rgba(239,68,68,0.3); }
+
+.route-body {
+  display: none;
+  border-top: 1px solid var(--border);
+  background: var(--bg);
+}
+
+.route-body.open { display: block; }
+
+.body-section {
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+.body-section:last-child { border-bottom: none; }
+
+.body-label {
+  font-size: 0.68rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 10px;
+}
+
+.code-block {
+  background: var(--surface);
+  border: 1px solid var(--border);
+  border-radius: 8px;
+  padding: 14px 16px;
+  font-family: var(--mono);
+  font-size: 0.76rem;
+  line-height: 1.7;
+  color: var(--text);
+  overflow-x: auto;
+  white-space: pre;
+}
+
+.code-block .key   { color: #7dd3fc; }
+.code-block .str   { color: #86efac; }
+.code-block .num   { color: #fca5a5; }
+.code-block .bool  { color: #c4b5fd; }
+.code-block .comm  { color: var(--muted); font-style: italic; }
+.code-block .url   { color: var(--accent); }
+
+.params-table { width: 100%; border-collapse: collapse; font-size: 0.78rem; }
+.params-table th {
+  text-align: left;
+  padding: 6px 12px;
+  font-size: 0.65rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 0.8px;
+  color: var(--muted);
+  border-bottom: 1px solid var(--border);
+}
+.params-table td {
+  padding: 8px 12px;
+  border-bottom: 1px solid var(--border2);
+  vertical-align: top;
+}
+.params-table tr:last-child td { border-bottom: none; }
+.params-table .param-name { font-family: var(--mono); color: var(--accent); font-size: 0.75rem; }
+.params-table .param-type { font-family: var(--mono); color: var(--purple); font-size: 0.7rem; }
+.params-table .param-req  { color: var(--DELETE); font-size: 0.65rem; font-weight: 600; }
+.params-table .param-opt  { color: var(--muted);  font-size: 0.65rem; }
+.params-table .param-desc { color: var(--text);   font-size: 0.75rem; }
+
+.expand-icon {
+  color: var(--muted);
+  font-size: 0.7rem;
+  margin-left: auto;
+  transition: transform 0.2s;
+}
+.expand-icon.open { transform: rotate(180deg); color: var(--text); }
+
+/* Socket Section */
+.socket-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
+  margin-top: 16px;
+}
+
+.socket-col {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 16px;
+}
+
+.socket-col h3 {
+  font-size: 0.72rem;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--muted);
+  margin-bottom: 12px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid var(--border);
+}
+
+.socket-event {
+  padding: 8px 0;
+  border-bottom: 1px solid var(--border2);
+}
+.socket-event:last-child { border-bottom: none; }
+.event-name { font-family: var(--mono); font-size: 0.8rem; color: var(--purple); margin-bottom: 3px; }
+.event-payload { font-family: var(--mono); font-size: 0.68rem; color: var(--muted); }
+
+/* Setup Guide */
+.setup-card {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 20px;
+  margin-bottom: 16px;
+}
+
+.setup-card h3 {
+  font-size: 0.85rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.step {
+  display: flex;
+  gap: 12px;
+  margin-bottom: 10px;
+  font-size: 0.8rem;
+}
+.step-num {
+  width: 22px;
+  height: 22px;
+  background: var(--accent);
+  color: white;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 0.65rem;
+  font-weight: 700;
+  flex-shrink: 0;
+  margin-top: 1px;
+}
+.step-text { color: var(--text); line-height: 1.5; }
+.step-text code {
+  font-family: var(--mono);
+  font-size: 0.72rem;
+  background: var(--surface);
+  padding: 1px 6px;
+  border-radius: 4px;
+  color: var(--accent);
+}
+
+/* Scrollbar */
+::-webkit-scrollbar { width: 5px; height: 5px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border2); border-radius: 10px; }
+</style>
+</head>
+<body>
+
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    <div class="brand">🛒 BazaarBuddy</div>
+    <div class="version">REST API v1.0</div>
+    <div class="base-url">localhost:5000/api</div>
+  </div>
+  <div class="sidebar-nav">
+    <div class="nav-section">
+      <div class="nav-section-title">Getting Started</div>
+      <a class="nav-item" href="#setup"><span class="icon">⚙️</span> Setup Guide</a>
+    </div>
+    <div class="nav-section">
+      <div class="nav-section-title">Endpoints</div>
+      <a class="nav-item" href="#auth">   <span class="icon">🔐</span> Auth     <span class="nav-count">3</span></a>
+      <a class="nav-item" href="#users">  <span class="icon">👤</span> Users    <span class="nav-count">7</span></a>
+      <a class="nav-item" href="#items">  <span class="icon">📦</span> Items    <span class="nav-count">8</span></a>
+      <a class="nav-item" href="#search"> <span class="icon">🔍</span> Search   <span class="nav-count">1</span></a>
+      <a class="nav-item" href="#chat">   <span class="icon">💬</span> Chat     <span class="nav-count">5</span></a>
+      <a class="nav-item" href="#ratings"><span class="icon">⭐</span> Ratings  <span class="nav-count">2</span></a>
+      <a class="nav-item" href="#reports"><span class="icon">🚩</span> Reports  <span class="nav-count">3</span></a>
+      <a class="nav-item" href="#socket"> <span class="icon">⚡</span> Socket.io<span class="nav-count">8</span></a>
+    </div>
+  </div>
+</nav>
+
+<div class="main">
+  <div class="top-bar">
+    <h1>BazaarBuddy API Reference</h1>
+    <div class="stats">
+      Total Routes: <span>29</span> &nbsp;|&nbsp; Models: <span>6</span> &nbsp;|&nbsp; Auth: <span>JWT Bearer</span>
+    </div>
+  </div>
+
+  <!-- SETUP -->
+  <div class="section" id="setup">
+    <div class="section-header">
+      <span class="emoji">⚙️</span>
+      <h2>Setup & Quick Start</h2>
+    </div>
+    <div class="setup-card">
+      <h3>🚀 Installation</h3>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Clone and install: <code>npm install</code></div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Copy <code>.env</code> and fill in MONGO_URI, JWT_SECRET, Cloudinary keys</div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Start dev server: <code>npm run dev</code></div></div>
+      <div class="step"><div class="step-num">4</div><div class="step-text">Health check: <code>GET http://localhost:5000/health</code></div></div>
+    </div>
+    <div class="setup-card">
+      <h3>🔑 Authentication</h3>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Register or login to get a JWT token</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Add to all protected requests: <code>Authorization: Bearer &lt;token&gt;</code></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Token expires in <code>7 days</code></div></div>
+    </div>
+    <div class="setup-card">
+      <h3>📤 File Uploads (Cloudinary)</h3>
+      <div class="step"><div class="step-num">1</div><div class="step-text">Use <code>multipart/form-data</code> for any file upload endpoint</div></div>
+      <div class="step"><div class="step-num">2</div><div class="step-text">Max file size: <code>5MB</code>. Formats: <code>jpg, jpeg, png, webp</code></div></div>
+      <div class="step"><div class="step-num">3</div><div class="step-text">Item photos: max <code>4 files</code> per upload (field name: <code>photos</code>)</div></div>
+    </div>
+  </div>
+
+  <!-- AUTH -->
+  <div class="section" id="auth">
+    <div class="section-header">
+      <span class="emoji">🔐</span><h2>Authentication</h2>
+      <span class="prefix">/api/auth</span>
+    </div>
+    <div class="routes-list">
+
+      <!-- Register -->
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/auth/register</span>
+          <span class="route-desc">Register new user</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section">
+            <div class="body-label">Request Body (JSON)</div>
+            <div class="code-block"><span class="comm">// Content-Type: application/json</span>
+{
+  <span class="key">"name"</span>:     <span class="str">"Rahul Sharma"</span>,
+  <span class="key">"email"</span>:    <span class="str">"rahul@example.com"</span>,
+  <span class="key">"phone"</span>:    <span class="str">"9876543210"</span>,
+  <span class="key">"password"</span>: <span class="str">"mypassword123"</span>
+}</div>
+          </div>
+          <div class="body-section">
+            <div class="body-label">Response 201</div>
+            <div class="code-block">{
+  <span class="key">"success"</span>: <span class="bool">true</span>,
+  <span class="key">"message"</span>: <span class="str">"Registration successful!"</span>,
+  <span class="key">"token"</span>:   <span class="str">"eyJhbGciOiJIUzI1NiIsInR5..."</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"_id"</span>:               <span class="str">"64f1a2b3c4d5e6f7a8b9c0d1"</span>,
+    <span class="key">"name"</span>:              <span class="str">"Rahul Sharma"</span>,
+    <span class="key">"email"</span>:             <span class="str">"rahul@example.com"</span>,
+    <span class="key">"phone"</span>:             <span class="str">"9876543210"</span>,
+    <span class="key">"isStudentVerified"</span>: <span class="bool">false</span>,
+    <span class="key">"rating"</span>: { <span class="key">"average"</span>: <span class="num">0</span>, <span class="key">"count"</span>: <span class="num">0</span> }
+  }
+}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Login -->
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/auth/login</span>
+          <span class="route-desc">Login and get JWT token</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section">
+            <div class="body-label">Request Body</div>
+            <div class="code-block">{
+  <span class="key">"email"</span>:    <span class="str">"rahul@example.com"</span>,
+  <span class="key">"password"</span>: <span class="str">"mypassword123"</span>
+}</div>
+          </div>
+          <div class="body-section">
+            <div class="body-label">Response 200</div>
+            <div class="code-block">{
+  <span class="key">"success"</span>: <span class="bool">true</span>,
+  <span class="key">"token"</span>: <span class="str">"eyJhbGciOiJIUzI1NiIsInR5..."</span>,
+  <span class="key">"data"</span>: { <span class="comm">/* user object */</span> }
+}</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Logout -->
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/auth/logout</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Logout (client clears token)</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section">
+            <div class="body-label">Headers</div>
+            <div class="code-block">Authorization: Bearer <span class="str">&lt;token&gt;</span></div>
+          </div>
+          <div class="body-section">
+            <div class="body-label">Response 200</div>
+            <div class="code-block">{ <span class="key">"success"</span>: <span class="bool">true</span>, <span class="key">"message"</span>: <span class="str">"Logged out successfully."</span> }</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- USERS -->
+  <div class="section" id="users">
+    <div class="section-header">
+      <span class="emoji">👤</span><h2>Users</h2>
+      <span class="prefix">/api/users</span>
+    </div>
+    <div class="routes-list">
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/users/me</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Get own profile</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Headers</div><div class="code-block">Authorization: Bearer <span class="str">&lt;token&gt;</span></div></div>
+          <div class="body-section"><div class="body-label">Response 200</div><div class="code-block">{
+  <span class="key">"success"</span>: <span class="bool">true</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"_id"</span>: <span class="str">"..."</span>, <span class="key">"name"</span>: <span class="str">"Rahul"</span>, <span class="key">"email"</span>: <span class="str">"..."</span>,
+    <span class="key">"avatar"</span>: <span class="str">""</span>, <span class="key">"locationName"</span>: <span class="str">"Kanpur, UP"</span>,
+    <span class="key">"isStudentVerified"</span>: <span class="bool">false</span>,
+    <span class="key">"rating"</span>: { <span class="key">"average"</span>: <span class="num">4.5</span>, <span class="key">"count"</span>: <span class="num">12</span> },
+    <span class="key">"listingsCount"</span>: <span class="num">3</span>
+  }
+}</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge PUT">PUT</span>
+          <span class="route-path">/api/users/me</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Update profile info</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request Body</div><div class="code-block">{
+  <span class="key">"name"</span>:         <span class="str">"Rahul Kumar"</span>,    <span class="comm">// optional</span>
+  <span class="key">"phone"</span>:        <span class="str">"9876543211"</span>,    <span class="comm">// optional</span>
+  <span class="key">"locationName"</span>: <span class="str">"Lucknow, UP"</span>    <span class="comm">// optional</span>
+}</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge PUT">PUT</span>
+          <span class="route-path">/api/users/me/avatar</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Upload profile photo</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request (multipart/form-data)</div><div class="code-block">Field: <span class="key">avatar</span> → <span class="str">image file (jpg/png/webp, max 2MB)</span></div></div>
+          <div class="body-section"><div class="body-label">Response 200</div><div class="code-block">{ <span class="key">"success"</span>: <span class="bool">true</span>, <span class="key">"data"</span>: { <span class="key">"avatar"</span>: <span class="str">"https://res.cloudinary.com/..."</span> } }</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge PUT">PUT</span>
+          <span class="route-path">/api/users/me/location</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Save browser GPS location</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request Body</div><div class="code-block">{
+  <span class="key">"lat"</span>:          <span class="num">26.4499</span>,
+  <span class="key">"lng"</span>:          <span class="num">80.3319</span>,
+  <span class="key">"locationName"</span>: <span class="str">"Kanpur, UP"</span>
+}</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/users/me/college-id</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Upload college ID → get student badge</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request (multipart/form-data)</div><div class="code-block">Field: <span class="key">collegeId</span> → <span class="str">image or PDF of college ID card</span></div></div>
+          <div class="body-section"><div class="body-label">Response 200</div><div class="code-block">{ <span class="key">"success"</span>: <span class="bool">true</span>, <span class="key">"message"</span>: <span class="str">"🎓 Student badge verified!"</span>,
+  <span class="key">"data"</span>: { <span class="key">"isStudentVerified"</span>: <span class="bool">true</span> } }</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/users/:userId</span>
+          <span class="route-desc">Public profile</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">URL Params</div><div class="code-block"><span class="key">userId</span>: <span class="str">"64f1a2b3c4d5e6f7a8b9c0d1"</span></div></div>
+          <div class="body-section"><div class="body-label">Response 200</div><div class="code-block">{
+  <span class="key">"success"</span>: <span class="bool">true</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"name"</span>: <span class="str">"Rahul"</span>, <span class="key">"avatar"</span>: <span class="str">"..."</span>,
+    <span class="key">"locationName"</span>: <span class="str">"Kanpur"</span>,
+    <span class="key">"isStudentVerified"</span>: <span class="bool">true</span>,
+    <span class="key">"rating"</span>: { <span class="key">"average"</span>: <span class="num">4.5</span>, <span class="key">"count"</span>: <span class="num">8</span> },
+    <span class="key">"listingsCount"</span>: <span class="num">5</span>
+  }
+}</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/users/:userId/listings</span>
+          <span class="route-desc">Get user's active listings</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Query Params</div>
+            <table class="params-table"><thead><tr><th>Param</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">page</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>1</td><td class="param-desc">Page number</td></tr>
+              <tr><td class="param-name">limit</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>12</td><td class="param-desc">Items per page</td></tr>
+            </tbody></table>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ITEMS -->
+  <div class="section" id="items">
+    <div class="section-header">
+      <span class="emoji">📦</span><h2>Items</h2>
+      <span class="prefix">/api/items</span>
+    </div>
+    <div class="routes-list">
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/items</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Create new listing</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request (multipart/form-data)</div><div class="code-block">Field: <span class="key">title</span>       → <span class="str">"Old Laptop Dell i5"</span>
+Field: <span class="key">description</span> → <span class="str">"Working condition, minor scratches"</span>
+Field: <span class="key">price</span>       → <span class="num">5000</span>          <span class="comm">// 0 = FREE badge</span>
+Field: <span class="key">category</span>    → <span class="str">"Electronics"</span>
+Field: <span class="key">locationName</span>→ <span class="str">"Kanpur, UP"</span>   <span class="comm">// optional</span>
+Field: <span class="key">lat</span>         → <span class="num">26.4499</span>       <span class="comm">// optional override</span>
+Field: <span class="key">lng</span>         → <span class="num">80.3319</span>       <span class="comm">// optional override</span>
+Files: <span class="key">photos</span>      → <span class="str">up to 4 image files</span></div></div>
+          <div class="body-section"><div class="body-label">Categories</div><div class="code-block"><span class="str">"Electronics"</span> | <span class="str">"Furniture"</span> | <span class="str">"Books"</span> | <span class="str">"Clothes"</span> | <span class="str">"Farm Tools"</span> | <span class="str">"Other"</span></div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/items?lat=&lng=&radius=</span>
+          <span class="route-desc">Get nearby items (geo)</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Query Params</div>
+            <table class="params-table"><thead><tr><th>Param</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">lat</td><td class="param-type">number</td><td class="param-req">Required</td><td>–</td><td class="param-desc">User latitude</td></tr>
+              <tr><td class="param-name">lng</td><td class="param-type">number</td><td class="param-req">Required</td><td>–</td><td class="param-desc">User longitude</td></tr>
+              <tr><td class="param-name">radius</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>5</td><td class="param-desc">Radius in km (1–20)</td></tr>
+              <tr><td class="param-name">page</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>1</td><td class="param-desc">Page number</td></tr>
+              <tr><td class="param-name">limit</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>20</td><td class="param-desc">Items per page</td></tr>
+            </tbody></table>
+          </div>
+          <div class="body-section"><div class="body-label">Example Request</div><div class="code-block"><span class="url">GET /api/items?lat=26.4499&lng=80.3319&radius=5&page=1&limit=20</span></div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/items/my</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Get my listings</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Headers</div><div class="code-block">Authorization: Bearer <span class="str">&lt;token&gt;</span></div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/items/:itemId</span>
+          <span class="route-desc">Get single item detail</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Response 200</div><div class="code-block">{
+  <span class="key">"data"</span>: {
+    <span class="key">"title"</span>: <span class="str">"Dell Laptop"</span>, <span class="key">"price"</span>: <span class="num">5000</span>, <span class="key">"isFree"</span>: <span class="bool">false</span>,
+    <span class="key">"category"</span>: <span class="str">"Electronics"</span>, <span class="key">"photos"</span>: [<span class="str">"url1"</span>, <span class="str">"url2"</span>],
+    <span class="key">"views"</span>: <span class="num">42</span>, <span class="key">"isSold"</span>: <span class="bool">false</span>,
+    <span class="key">"owner"</span>: { <span class="key">"name"</span>: <span class="str">"Rahul"</span>, <span class="key">"phone"</span>: <span class="str">"987..."</span>, <span class="key">"rating"</span>: {} }
+  }
+}</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge PUT">PUT</span>
+          <span class="route-path">/api/items/:itemId</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Edit item (owner only)</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request Body (JSON)</div><div class="code-block">{
+  <span class="key">"title"</span>:       <span class="str">"Updated Title"</span>,     <span class="comm">// optional</span>
+  <span class="key">"price"</span>:       <span class="num">4500</span>,               <span class="comm">// optional</span>
+  <span class="key">"description"</span>: <span class="str">"Updated desc"</span>      <span class="comm">// optional</span>
+}</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge DELETE">DELETE</span>
+          <span class="route-path">/api/items/:itemId</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Delete item (owner only)</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Response 200</div><div class="code-block">{ <span class="key">"success"</span>: <span class="bool">true</span>, <span class="key">"message"</span>: <span class="str">"Item deleted."</span> }</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge PATCH">PATCH</span>
+          <span class="route-path">/api/items/:itemId/sold</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Mark as sold</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">No body needed. Just call the route.</div><div class="code-block">{ <span class="key">"success"</span>: <span class="bool">true</span>, <span class="key">"message"</span>: <span class="str">"Item marked as sold! 🎉"</span> }</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/items/:itemId/photos</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Add photos to listing</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request (multipart/form-data)</div><div class="code-block">Files: <span class="key">photos</span> → <span class="str">1–4 image files (total across all uploads max 4)</span></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SEARCH -->
+  <div class="section" id="search">
+    <div class="section-header">
+      <span class="emoji">🔍</span><h2>Search</h2>
+      <span class="prefix">/api/search</span>
+    </div>
+    <div class="routes-list">
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/search?q=laptop&lat=26.4&lng=80.3&radius=10</span>
+          <span class="route-desc">Full text + geo + filter search</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">All Query Params</div>
+            <table class="params-table"><thead><tr><th>Param</th><th>Type</th><th>Required</th><th>Default</th><th>Description</th></tr></thead>
+            <tbody>
+              <tr><td class="param-name">q</td><td class="param-type">string</td><td class="param-opt">Optional</td><td>–</td><td class="param-desc">Keyword search (title + description)</td></tr>
+              <tr><td class="param-name">lat</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>0</td><td class="param-desc">User latitude</td></tr>
+              <tr><td class="param-name">lng</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>0</td><td class="param-desc">User longitude</td></tr>
+              <tr><td class="param-name">radius</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>5</td><td class="param-desc">Search radius in km</td></tr>
+              <tr><td class="param-name">category</td><td class="param-type">string</td><td class="param-opt">Optional</td><td>–</td><td class="param-desc">Electronics / Furniture / Books / Clothes / Farm Tools / Other</td></tr>
+              <tr><td class="param-name">minPrice</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>–</td><td class="param-desc">Minimum price filter</td></tr>
+              <tr><td class="param-name">maxPrice</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>–</td><td class="param-desc">Maximum price filter</td></tr>
+              <tr><td class="param-name">page</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>1</td><td class="param-desc">Page number</td></tr>
+              <tr><td class="param-name">limit</td><td class="param-type">number</td><td class="param-opt">Optional</td><td>20</td><td class="param-desc">Results per page</td></tr>
+            </tbody></table>
+          </div>
+          <div class="body-section"><div class="body-label">Example Requests</div>
+            <div class="code-block"><span class="comm">// Search laptops within 10km of Kanpur</span>
+<span class="url">GET /api/search?q=laptop&lat=26.4499&lng=80.3319&radius=10</span>
+
+<span class="comm">// Electronics under ₹5000</span>
+<span class="url">GET /api/search?category=Electronics&maxPrice=5000&lat=26.4499&lng=80.3319</span>
+
+<span class="comm">// Free items nearby</span>
+<span class="url">GET /api/search?minPrice=0&maxPrice=0&lat=26.4499&lng=80.3319</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- CHAT -->
+  <div class="section" id="chat">
+    <div class="section-header">
+      <span class="emoji">💬</span><h2>Chat</h2>
+      <span class="prefix">/api/chat</span>
+    </div>
+    <div class="routes-list">
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/chat/conversations</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Start or get conversation for item</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request Body</div><div class="code-block">{ <span class="key">"itemId"</span>: <span class="str">"64f1a2b3c4d5e6f7a8b9c0d1"</span> }</div></div>
+          <div class="body-section"><div class="body-label">Response 201</div><div class="code-block">{
+  <span class="key">"success"</span>: <span class="bool">true</span>,
+  <span class="key">"data"</span>: {
+    <span class="key">"_id"</span>: <span class="str">"conv_id..."</span>,
+    <span class="key">"item"</span>:   { <span class="key">"title"</span>: <span class="str">"Dell Laptop"</span>, <span class="key">"price"</span>: <span class="num">5000</span> },
+    <span class="key">"buyer"</span>:  { <span class="key">"name"</span>: <span class="str">"Rahul"</span>, <span class="key">"avatar"</span>: <span class="str">"..."</span> },
+    <span class="key">"seller"</span>: { <span class="key">"name"</span>: <span class="str">"Priya"</span>, <span class="key">"phone"</span>:  <span class="str">"98..."</span> }
+  }
+}</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/chat/conversations</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">List all my conversations</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Returns</div><div class="code-block">Array of conversations sorted by last message date.
+Each includes: item info, buyer/seller names, lastMessage, unread counts.</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/chat/conversations/:convId</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Get conversation details</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Note</div><div class="code-block">Only the buyer and seller of this conversation can access it.</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/chat/conversations/:convId/messages</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Send a message (REST fallback)</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request Body</div><div class="code-block">{ <span class="key">"text"</span>: <span class="str">"Is this still available?"</span> }</div></div>
+          <div class="body-section"><div class="body-label">Note</div><div class="code-block">This also emits a <span class="key">new_message</span> Socket.io event to the conversation room.
+Use Socket.io for real-time; this is a REST fallback.</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/chat/conversations/:convId/messages</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Get all messages (paginated)</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Query Params</div><div class="code-block"><span class="key">page</span>=<span class="num">1</span>   <span class="key">limit</span>=<span class="num">50</span>   <span class="comm">// sorted oldest → newest</span></div></div>
+          <div class="body-section"><div class="body-label">Side Effect</div><div class="code-block">Marks all messages from the other person as <span class="key">isRead: true</span>
+Resets your unread count to <span class="num">0</span></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- RATINGS -->
+  <div class="section" id="ratings">
+    <div class="section-header">
+      <span class="emoji">⭐</span><h2>Ratings</h2>
+      <span class="prefix">/api/ratings</span>
+    </div>
+    <div class="routes-list">
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/ratings</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Rate a seller after deal</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request Body</div><div class="code-block">{
+  <span class="key">"rateeId"</span>: <span class="str">"seller_user_id"</span>,
+  <span class="key">"itemId"</span>:  <span class="str">"item_id"</span>,
+  <span class="key">"stars"</span>:   <span class="num">5</span>,                           <span class="comm">// 1 to 5</span>
+  <span class="key">"comment"</span>: <span class="str">"Great seller, fast response!"</span>   <span class="comm">// optional</span>
+}</div></div>
+          <div class="body-section"><div class="body-label">Note</div><div class="code-block">Auto-recalculates seller's average rating after every new rating.
+One rating per (rater + item) pair — duplicate prevented.</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/ratings/user/:userId</span>
+          <span class="route-desc">Get all ratings for a user</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Response 200</div><div class="code-block">{
+  <span class="key">"success"</span>: <span class="bool">true</span>,
+  <span class="key">"count"</span>: <span class="num">12</span>,
+  <span class="key">"data"</span>: [
+    { <span class="key">"stars"</span>: <span class="num">5</span>, <span class="key">"comment"</span>: <span class="str">"..."</span>,
+      <span class="key">"rater"</span>: { <span class="key">"name"</span>: <span class="str">"Ankit"</span> },
+      <span class="key">"item"</span>: { <span class="key">"title"</span>: <span class="str">"Dell Laptop"</span> } }
+  ]
+}</div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- REPORTS -->
+  <div class="section" id="reports">
+    <div class="section-header">
+      <span class="emoji">🚩</span><h2>Reports</h2>
+      <span class="prefix">/api/reports</span>
+    </div>
+    <div class="routes-list">
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge POST">POST</span>
+          <span class="route-path">/api/reports</span>
+          <span class="badge badge-auth">🔒 Auth</span>
+          <span class="route-desc">Report a fake/spam listing</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request Body</div><div class="code-block">{
+  <span class="key">"itemId"</span>: <span class="str">"64f1a2b3c4d5e6f7a8b9c0d1"</span>,
+  <span class="key">"reason"</span>: <span class="str">"This item is fake / already sold / spam"</span>
+}</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge GET">GET</span>
+          <span class="route-path">/api/reports</span>
+          <span class="badge badge-admin">👑 Admin</span>
+          <span class="route-desc">Get all reports (admin only)</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Query Params</div><div class="code-block"><span class="key">status</span>=<span class="str">pending</span>  <span class="comm">// filter: pending | reviewed | resolved</span>
+<span class="key">page</span>=<span class="num">1</span>  <span class="key">limit</span>=<span class="num">20</span></div></div>
+          <div class="body-section"><div class="body-label">To Make Admin</div><div class="code-block">In MongoDB, manually set <span class="key">isAdmin: true</span> on a user document.
+Then login with that user → their token will have admin access.</div></div>
+        </div>
+      </div>
+
+      <div class="route-card">
+        <div class="route-header" onclick="toggle(this)">
+          <span class="method-badge PATCH">PATCH</span>
+          <span class="route-path">/api/reports/:reportId</span>
+          <span class="badge badge-admin">👑 Admin</span>
+          <span class="route-desc">Update report status</span>
+          <span class="expand-icon">▼</span>
+        </div>
+        <div class="route-body">
+          <div class="body-section"><div class="body-label">Request Body</div><div class="code-block">{ <span class="key">"status"</span>: <span class="str">"reviewed"</span> }  <span class="comm">// pending | reviewed | resolved</span></div></div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- SOCKET.IO -->
+  <div class="section" id="socket">
+    <div class="section-header">
+      <span class="emoji">⚡</span><h2>Socket.io — Real-time Chat</h2>
+      <span class="prefix">ws://localhost:5000</span>
+    </div>
+    <div class="setup-card">
+      <h3>🔌 Connection</h3>
+      <div class="code-block"><span class="comm">// npm install socket.io-client</span>
+<span class="key">import</span> { io } from <span class="str">'socket.io-client'</span>;
+
+<span class="key">const</span> socket = io(<span class="str">'http://localhost:5000'</span>, {
+  auth: { token: <span class="str">'your_jwt_token_here'</span> }  <span class="comm">// Required!</span>
+});
+
+socket.on(<span class="str">'connect'</span>,       () => console.log(<span class="str">'Connected'</span>));
+socket.on(<span class="str">'connect_error'</span>, (e) => console.log(<span class="str">'Auth error'</span>, e.message));</div>
+    </div>
+    <div class="socket-grid">
+      <div class="socket-col">
+        <h3>📤 Client → Server (emit)</h3>
+        <div class="socket-event">
+          <div class="event-name">join_conversation</div>
+          <div class="event-payload">socket.emit('join_conversation', { conversationId: 'id' })</div>
+        </div>
+        <div class="socket-event">
+          <div class="event-name">send_message</div>
+          <div class="event-payload">socket.emit('send_message', { conversationId: 'id', text: 'Hello!' })</div>
+        </div>
+        <div class="socket-event">
+          <div class="event-name">typing</div>
+          <div class="event-payload">socket.emit('typing', { conversationId: 'id' })</div>
+        </div>
+        <div class="socket-event">
+          <div class="event-name">stop_typing</div>
+          <div class="event-payload">socket.emit('stop_typing', { conversationId: 'id' })</div>
+        </div>
+        <div class="socket-event">
+          <div class="event-name">leave_conversation</div>
+          <div class="event-payload">socket.emit('leave_conversation', { conversationId: 'id' })</div>
+        </div>
+      </div>
+      <div class="socket-col">
+        <h3>📥 Server → Client (listen)</h3>
+        <div class="socket-event">
+          <div class="event-name">new_message</div>
+          <div class="event-payload">socket.on('new_message', (message) => { ... })</div>
+        </div>
+        <div class="socket-event">
+          <div class="event-name">user_typing</div>
+          <div class="event-payload">socket.on('user_typing', ({ userId }) => { ... })</div>
+        </div>
+        <div class="socket-event">
+          <div class="event-name">user_stop_typing</div>
+          <div class="event-payload">socket.on('user_stop_typing', ({ userId }) => { ... })</div>
+        </div>
+        <div class="socket-event">
+          <div class="event-name">error</div>
+          <div class="event-payload">socket.on('error', ({ message }) => { ... })</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- end main -->
+
+<script>
+function toggle(header) {
+  const body = header.nextElementSibling;
+  const icon = header.querySelector('.expand-icon');
+  body.classList.toggle('open');
+  icon.classList.toggle('open');
+}
+</script>
+</body>
+</html>
